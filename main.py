@@ -53,3 +53,5 @@ def main():
 
     sender = input("Sender: ")
 
+if __name__ == "__main__":
+    main()
