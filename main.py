@@ -18,6 +18,17 @@ def main():
     MAX_RECEIVERS = int(input("Chunk size: "))
     RECEIVERS: list[str] = []
 
+    print("Please ensure the following:")
+    print("1. the receivers.txt file is in the same directory as this program. It shall contain the list of receivers, seperated by line-breaks.")
+    print("2. the content.html file is in the same directory as this program. It shall contain the html content of the email.")
+    print("3. the content.txt file is in the same directory as this program. It shall contain the text content of the email.")
+    print("4. the sender email address and password you will enter are correct.")
+
+    print("Press enter to continue...")
+    input()
+
+    print("=== reading files ===")
+
     with open("receivers.txt", "r") as file:
         receivers = file.readlines()
         for receiver in receivers:
