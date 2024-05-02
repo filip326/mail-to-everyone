@@ -1,6 +1,5 @@
 """
-This is a simple program that will take a list of receivers and a message and send the message to all the receivers,
-but in chunks, to avoid overloading the server and bypass rate or max recipients limits.
+This is a simple program that will take a list of receivers and a message and send the message to all the receivers.
 
 The program will take the following inputs:
 - Chunk size: The number of receivers to send the message to at a time.
@@ -20,7 +19,6 @@ from email.mime.multipart import MIMEMultipart
 
 
 def main():
-    MAX_RECEIVERS = int(input("Chunk size: "))
     RECEIVERS: list[str] = []
 
     print("Please ensure the following:")
@@ -80,27 +78,19 @@ def main():
 
         print("=== sending emails ===")
 
-        # send email to all receivers in chunks
-        # first divide the receivers into chunks
-        receiver_chunks: list[list[str]] = [
-            RECEIVERS[i : i + MAX_RECEIVERS]
-            for i in range(0, len(RECEIVERS), MAX_RECEIVERS)
-        ]
-
         counter = 0
 
-        for chunk in receiver_chunks:
+        for receiver in receivers:
             message = MIMEMultipart("alternative")
             message["Subject"] = subject
             message["From"] = sender_email
             message["To"] = (
-                sender_email  # always send to self and use Bcc to send to receivers (data privacy)
+                receiver  # always send to self and use Bcc to send to receivers (data privacy)
             )
-            message["Bcc"] = ", ".join(chunk)
             message.attach(MIMEText(html_message, "html"))
             message.attach(MIMEText(text_message, "plain"))
 
-            server.sendmail(sender_email, sender_email, message.as_string())
+            server.sendmail(sender_email, receiver, message.as_string())
 
             counter += 1
 
