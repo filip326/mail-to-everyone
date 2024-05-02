@@ -87,6 +87,8 @@ def main():
             for i in range(0, len(RECEIVERS), MAX_RECEIVERS)
         ]
 
+        counter = 0
+
         for chunk in receiver_chunks:
             message = MIMEMultipart("alternative")
             message["Subject"] = subject
@@ -100,7 +102,9 @@ def main():
 
             server.sendmail(sender_email, sender_email, message.as_string())
 
-        print("=== emails sent ===")
+            counter += 1
+
+        print(f"=== {counter} emails sent ===")
         server.quit()
 
     print("=== done ===")
