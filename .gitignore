@@ -1,3 +1,5 @@
 content.html
 content.txt
 receivers.txt
+
+*.local.*
