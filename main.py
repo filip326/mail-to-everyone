@@ -13,6 +13,10 @@ The program will take the following inputs:
 """
 
 import getpass
+import smtplib as smtp
+import ssl
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 def main():
     MAX_RECEIVERS = int(input("Chunk size: "))
@@ -42,16 +46,48 @@ def main():
 
     subject = input("Subject: ")
     smtp_server = input("SMTP Server: ")
-    smtp_port = input("SMTP Port (default=587): ")
+    smtp_port = input("SMTP Port (default=465): ")
     if smtp_port == "":
-        smtp_port = 587
+        smtp_port = 465
     else:
         smtp_port = int(smtp_port)
     
     smtp_username = input("SMTP Username: ")
     smtp_password = getpass.getpass("SMTP Password: ")
 
-    sender = input("Sender: ")
+    sender_email = input("Sender: ")
+
+    # create a secure SSL context
+    ssl_context = ssl.create_default_context()
+
+
+
+    with smtp.SMTP_SSL(smtp_server, smtp_port, context=ssl_context) as server:
+        server.login(smtp_username, smtp_password)
+        print("=== logged in ===")
+
+        if input(f"Confirm sending email to {len(receiver)} receivers? (y for yes)") != "y":
+            print("Exiting...")
+            return
+        
+        print("=== sending emails ===")
+
+        # send email to all receivers in chunks
+        # first divide the receivers into chunks
+        receiver_chunks: list[list[str]] = [RECEIVERS[i:i+MAX_RECEIVERS] for i in range(0, len(RECEIVERS), MAX_RECEIVERS)]
+
+        for chunk in receiver_chunks:
+            message = MIMEMultipart("alternative")
+            message["Subject"] = subject
+            message["From"] = sender_email
+            message["To"] = sender_email # always send to self and use Bcc to send to receivers (data privacy)
+            message["Bcc"] = ", ".join(chunk)
+            message.attach(MIMEText(html_message, "html"))
+            message.attach(MIMEText(text_message, "plain"))
+
+            print(message.as_string())
+            
+
 
 if __name__ == "__main__":
     main()
